@@ -7,6 +7,19 @@ const canvasAreaSection = document.querySelector("#canvas")
 const randomId = (length = 6) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
+
+
+function selectElementById(id) {
+
+  canvasAreaSection.querySelectorAll(".selected")
+    .forEach(el => el.classList.remove("selected"));
+
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.classList.add("selected");
+  selectedElementId = id;
+}
  
 const elements = [];
 let selectedElementId = null;
@@ -38,6 +51,15 @@ rectBtn.addEventListener("click",(e)=>{
   selectedElementId = div.id;
   canvasAreaSection.append(div)
   elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff"})
+
+
+ 
+  // add functionality of each rectangle div for selection
+  div.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    selectElementById(div.id);
+  })
+
   
 })
 
@@ -72,4 +94,23 @@ textBtn.addEventListener("click",(e)=>{
   canvasAreaSection.append(div)
   elements.push({id,type:"text",x,y,width:190,height:30,bgColor:"transparent"})
 
+
+    // add functionality of each text div for selection
+   div.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    selectElementById(div.id);
+  })
+
+
+})
+
+
+
+// deselect everying click on canvas
+
+canvasAreaSection.addEventListener('click',(e)=>{
+  canvasAreaSection.querySelectorAll(".selected")
+  .forEach(el=>el.classList.remove("selected"))
+
+  selectedElementId = null;
 })
