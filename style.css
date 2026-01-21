@@ -108,7 +108,7 @@ body {
 
 
 
-/* // handler resize  */
+/*  handler resize  */
 
 .resize-handle {
   width: 8px;
@@ -126,3 +126,28 @@ body {
 .resize-handle.tr { top: -4px; right: -4px; cursor: nesw-resize; }
 .resize-handle.bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
 .resize-handle.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
+
+
+
+
+
+
+
+/* for rotate handler  */
+
+.rotate-handle {
+  width: 10px;
+  height: 10px;
+  background: #4f8cff;
+  border-radius: 50%;
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: grab;
+}
+
+
+.selected {
+  transform-origin: center;
+}

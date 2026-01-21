@@ -13,6 +13,7 @@ function selectElementById(id) {
   canvasAreaSection.querySelectorAll(".selected").forEach(el => {
     el.classList.remove("selected");
     removeResizeHandles(el);
+    el.querySelector(".rotate-handle")?.remove(); 
   });
 
   const el = document.getElementById(id);
@@ -22,6 +23,7 @@ function selectElementById(id) {
   selectedElementId = id;
 
   addResizeHandles(el);
+  addRotateHandle(el); 
 }
 
 
@@ -66,9 +68,14 @@ let startX = 0;
 let startY = 0;
 
 
+// rotation the element
+let isRotating = false;
+let rotateCenterX = 0;
+let rotateCenterY = 0;
+
+
 
 // rectangle functionality all add here
-
 rectBtn.addEventListener("click",(e)=>{
   
   const id = randomId(10);
@@ -90,7 +97,7 @@ rectBtn.addEventListener("click",(e)=>{
   div.dataset.type = "rect"
 
   canvasAreaSection.append(div)
-  elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff"})
+  elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff", rotation: 0})
   selectElementById(div.id);
 
 
@@ -156,7 +163,7 @@ textBtn.addEventListener("click",(e)=>{
   div.dataset.type = "text"
 
   canvasAreaSection.append(div)
-  elements.push({id,type:"text",x,y,width:190,height:30,bgColor:"transparent"})
+  elements.push({id,type:"text",x,y,width:190,height:30,bgColor:"transparent",  rotation: 0})
   selectElementById(div.id);
 
 
@@ -274,6 +281,25 @@ document.addEventListener("mousemove", (e) => {
 }
 
 
+   
+if (isRotating && selectedElementId) {
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const dx = e.clientX - rotateCenterX;
+  const dy = e.clientY - rotateCenterY;
+
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+  el.style.transform = `rotate(${angle}deg)`;
+  elData.rotation = angle;
+
+  return;
+}
+
+
+
 
   if (!isDragging || !selectedElementId) return;
 
@@ -306,9 +332,13 @@ document.addEventListener("mousemove", (e) => {
 });
 
 
+
+
+// stop everyting
 document.addEventListener("mouseup", () => {
-  isDragging = false;
+   isDragging = false;
   isResizing = false;
+  isRotating = false;
   resizeDirection = null;
 });
 
@@ -354,3 +384,26 @@ function removeResizeHandles(el) {
 
 
 
+
+
+
+// rotation helper function
+
+
+function addRotateHandle(el) {
+  const handle = document.createElement("div");
+  handle.className = "rotate-handle";
+
+  handle.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    isRotating = true;
+
+    const rect = el.getBoundingClientRect();
+    rotateCenterX = rect.left + rect.width / 2;
+    rotateCenterY = rect.top + rect.height / 2;
+  });
+
+  el.appendChild(handle);
+}
