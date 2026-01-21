@@ -32,7 +32,29 @@ body {
   width: 64px;
   background-color:  #2c2c2c;
   border-right: 1px solid #3a3a3a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
 }
+
+#left-toolbar span{
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: rgb(79, 143, 216);
+  border-radius: 5px;
+  padding: 5px;
+  transition: scale 0.4s linear;
+}
+
+#left-toolbar span:active{
+  scale: 0.5;
+}
+
+
+
 
 
 /* workspace styling  */
