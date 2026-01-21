@@ -1,0 +1,75 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html , body{
+    height: 100%;
+    width: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #1e1e1e; 
+  color: #eaeaea;
+  height: 100vh;
+}
+
+/* app container styling  */
+
+#app{
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+}
+
+
+
+/* left-toolbar styling  */
+
+#left-toolbar{
+  width: 64px;
+  background-color:  #2c2c2c;
+  border-right: 1px solid #3a3a3a;
+}
+
+
+/* workspace styling  */
+
+#workspace{
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1e1e1e;
+}
+
+
+
+
+/* #canvas styling  */
+#canvas{
+ width: 900px;
+  height: 600px;
+  background-color: #252525;
+   background-image:
+    linear-gradient(#2f2f2f 1px, transparent 1px),
+    linear-gradient(90deg, #2f2f2f 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid #555;
+  position: relative;
+}
+
+
+
+
+/* right sidebar styling  */
+
+#right-sidebar{
+  width: 280px;
+  background-color: #2c2c2c;
+  border-left: 1px solid #3a3a3a;
+  padding: 10px;
+  overflow-y: auto;
+}
