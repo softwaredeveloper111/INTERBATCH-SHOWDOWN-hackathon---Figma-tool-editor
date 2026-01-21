@@ -26,7 +26,25 @@ let selectedElementId = null;
 const base = 40;
 
 
-// functionality add on click on rectangle button
+
+
+let isDragging = false;
+
+let dragStartX = 0;
+let dragStartY = 0;
+
+let elementStartX = 0;
+let elementStartY = 0;
+
+
+function getElementDataById(id) {
+  return elements.find(el => el.id === id);
+}
+
+
+
+
+// rectangle functionality all add here
 
 rectBtn.addEventListener("click",(e)=>{
   
@@ -48,16 +66,37 @@ rectBtn.addEventListener("click",(e)=>{
   div.id = id;
   div.dataset.type = "rect"
 
-  selectedElementId = div.id;
   canvasAreaSection.append(div)
+  selectElementById(div.id);
   elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff"})
 
 
  
-  // add functionality of each rectangle div for selection
+  // add selection functionality here
   div.addEventListener("click",(e)=>{
     e.stopPropagation();
     selectElementById(div.id);
+  })
+
+
+  //  Add dragging functionality here.
+  div.addEventListener("mousedown",(e)=>{
+      e.preventDefault();
+      if (e.target !== div) return; 
+      if (div.id !== selectedElementId) return;
+
+      isDragging = true;
+
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+
+        const elData = getElementDataById(div.id);
+        if (!elData) return;
+
+        elementStartX = elData.x;
+        elementStartY = elData.y; 
+
   })
 
   
@@ -65,8 +104,8 @@ rectBtn.addEventListener("click",(e)=>{
 
 
 
-// functionality add on click on text  button
 
+// textbutton functionality all add here 
 textBtn.addEventListener("click",(e)=>{
 
   const id = randomId(10);
@@ -90,15 +129,36 @@ textBtn.addEventListener("click",(e)=>{
   div.id = id;
   div.dataset.type = "text"
 
-  selectedElementId = div.id;
   canvasAreaSection.append(div)
+  selectElementById(div.id);
   elements.push({id,type:"text",x,y,width:190,height:30,bgColor:"transparent"})
 
 
-    // add functionality of each text div for selection
+    // add selection functionality here.
    div.addEventListener("click",(e)=>{
     e.stopPropagation();
     selectElementById(div.id);
+  })
+
+
+    //  Add dragging functionality here.
+  div.addEventListener("mousedown",(e)=>{
+     e.preventDefault(); 
+      if (e.target !== div) return; 
+      if (div.id !== selectedElementId) return;
+
+      isDragging = true;
+
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+
+        const elData = getElementDataById(div.id);
+        if (!elData) return;
+
+        elementStartX = elData.x;
+        elementStartY = elData.y; 
+
   })
 
 
@@ -107,10 +167,46 @@ textBtn.addEventListener("click",(e)=>{
 
 
 // deselect everying click on canvas
-
 canvasAreaSection.addEventListener('click',(e)=>{
   canvasAreaSection.querySelectorAll(".selected")
   .forEach(el=>el.classList.remove("selected"))
 
   selectedElementId = null;
 })
+
+
+document.addEventListener("mousemove", (e) => {
+  if (!isDragging || !selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+
+  let newX = elementStartX + dx;
+  let newY = elementStartY + dy;
+
+  
+  const canvasRect = canvasAreaSection.getBoundingClientRect();
+
+  const maxX = canvasRect.width - elData.width;
+  const maxY = canvasRect.height - elData.height;
+
+  newX = Math.max(0, Math.min(newX, maxX));
+  newY = Math.max(0, Math.min(newY, maxY));
+
+
+  el.style.left = `${newX}px`;
+  el.style.top = `${newY}px`;
+
+
+  elData.x = newX;
+  elData.y = newY;
+});
+
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+});
