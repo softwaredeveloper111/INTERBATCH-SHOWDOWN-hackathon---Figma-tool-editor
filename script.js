@@ -216,6 +216,7 @@ canvasAreaSection.addEventListener('click', () => {
   canvasAreaSection.querySelectorAll(".selected").forEach(el => {
     el.classList.remove("selected");
     removeResizeHandles(el);
+    el.querySelector(".rotate-handle")?.remove(); 
   });
 
   selectedElementId = null;
