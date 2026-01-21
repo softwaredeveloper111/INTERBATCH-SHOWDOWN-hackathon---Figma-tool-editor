@@ -104,3 +104,25 @@ body {
   outline: 2px solid #4f8cff;
   outline-offset: 2px;
 }
+
+
+
+
+/* // handler resize  */
+
+.resize-handle {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 1px solid #4f8cff;
+  position: absolute;
+}
+
+[data-type="text"] .resize-handle {
+  background: #4f8cff;
+}
+
+.resize-handle.tl { top: -4px; left: -4px; cursor: nwse-resize; }
+.resize-handle.tr { top: -4px; right: -4px; cursor: nesw-resize; }
+.resize-handle.bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.resize-handle.br { bottom: -4px; right: -4px; cursor: nwse-resize; }
