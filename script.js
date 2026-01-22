@@ -5,16 +5,14 @@ const canvasAreaSection = document.querySelector("#canvas")
 
 
 
-
-
-
-
 // dom reference 
 const propWidth = document.querySelector("#prop-width");
 const propHeight = document.querySelector("#prop-height");
 const propBg = document.querySelector("#prop-bg");
 const propText = document.querySelector("#prop-text");
 const textProps = document.querySelector("#text-props");
+const propTextColor = document.querySelector("#prop-text-color");
+
 
 
 
@@ -54,12 +52,22 @@ function selectElementById(id) {
     propBg.value = elData.bgColor || "#000000";
 
     // text-specific
-    if (elData.type === "text") {
+        if (elData.type === "text") {
       textProps.style.display = "block";
-      propText.value = document.getElementById(id).textContent;
+      propText.value = el.textContent;
+
+     
+      el.style.height = "auto";
+      elData.height = el.scrollHeight;
+      el.style.height = elData.height + "px";
+
+      propTextColor.value = rgbToHex(
+        window.getComputedStyle(el).color
+      );
     } else {
       textProps.style.display = "none";
     }
+
 
 }
 
@@ -124,7 +132,7 @@ rectBtn.addEventListener("click",(e)=>{
   const div = document.createElement("div");
   div.style.height = "80px";
   div.style.width = "100px";
-  div.style.backgroundColor = "#4f8cff";
+  div.style.backgroundColor = "#ffffff";
   div.style.position = "absolute";
   div.style.top = `${y}px`;
   div.style.left = `${x}px`;
@@ -135,7 +143,7 @@ rectBtn.addEventListener("click",(e)=>{
 
 
   canvasAreaSection.append(div)
-  elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff", rotation: 0})
+  elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#ffffff", rotation: 0})
   syncZIndex();
   renderLayers();
   selectElementById(div.id);
@@ -396,6 +404,76 @@ document.addEventListener("mouseup", () => {
 });
 
 
+// keyboard interaction for delete as well as mouup and move down via arrow key
+document.addEventListener("keydown", (e) => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const STEP = 5;
+  const canvasRect = canvasAreaSection.getBoundingClientRect();
+
+  // DELETE KEY
+  if (e.key === "Delete") {
+    el.remove();
+
+    const index = elements.findIndex(item => item.id === selectedElementId);
+    if (index !== -1) {
+      elements.splice(index, 1);
+    }
+
+    selectedElementId = null;
+    renderLayers();
+    saveToLocalStorage();
+    return;
+  }
+
+  let newX = elData.x;
+  let newY = elData.y;
+
+  // ARROW KEYS
+  switch (e.key) {
+    case "ArrowUp":
+      newY -= STEP;
+      break;
+    case "ArrowDown":
+      newY += STEP;
+      break;
+    case "ArrowLeft":
+      newX -= STEP;
+      break;
+    case "ArrowRight":
+      newX += STEP;
+      break;
+    default:
+      return;
+  }
+
+  // PREVENT PAGE SCROLL
+  e.preventDefault();
+
+  // CANVAS BOUNDARY CHECK
+  const maxX = canvasRect.width - elData.width;
+  const maxY = canvasRect.height - elData.height;
+
+  newX = Math.max(0, Math.min(newX, maxX));
+  newY = Math.max(0, Math.min(newY, maxY));
+
+  // APPLY
+  el.style.left = `${newX}px`;
+  el.style.top = `${newY}px`;
+
+  elData.x = newX;
+  elData.y = newY;
+
+  saveToLocalStorage();
+});
+
+
+
+
 
 
 function addResizeHandles(el) {
@@ -625,7 +703,8 @@ function saveToLocalStorage() {
       const domEl = document.getElementById(el.id);
       return {
         ...el,
-        text: domEl ? domEl.textContent : ""
+        text: domEl ? domEl.textContent : "",
+        textColor: domEl ? domEl.style.color : "#ffffff"
       };
     }
     return el;
@@ -658,7 +737,7 @@ function recreateElement(data) {
   if (data.type === "text") {
     div.textContent = data.text || "";
     div.contentEditable = true;
-    div.style.color = "white";
+    div.style.color = data.textColor || "white";
     div.style.wordBreak = "break-word";
     div.style.whiteSpace = "pre-wrap";
     div.style.cursor = "text";
@@ -707,6 +786,8 @@ function recreateElement(data) {
       saveToLocalStorage();
     });
   }
+
+ 
 }
 
 
@@ -793,7 +874,7 @@ function exportAsHTML() {
       html += `
     <div style="
       ${baseStyle}
-      color: black;
+      color: ${domEl ? domEl.style.color : "black"};
       background-color: transparent;
       white-space: pre-wrap;
       word-break: break-word;
@@ -827,3 +908,30 @@ function exportAsHTML() {
 
   URL.revokeObjectURL(url);
 }
+
+
+
+
+// adding extra feature like change the color of text 
+
+function rgbToHex(rgb) {
+  const res = rgb.match(/\d+/g);
+  return "#" + res.map(x =>
+    (+x).toString(16).padStart(2, "0")
+  ).join("");
+}
+
+
+
+
+propTextColor.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+
+  if (!el || elData.type !== "text") return;
+
+  el.style.color = propTextColor.value;
+  saveToLocalStorage();
+});

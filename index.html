@@ -15,7 +15,10 @@
 
 
   <div id="app">
+    
 
+
+    <!-- left-toolbar is here  -->
 
     <div id="left-toolbar">
       <span id="rectangleIcon" title="Add reactangle"><i class="ri-rectangle-line"></i></span>
@@ -23,12 +26,19 @@
     </div>
 
 
+    <!-- workspace and canvas area is here  -->
+
+
     <div id="workspace">
       <div id="canvas">
 
       </div>
     </div>
+   
+    
 
+    <!-- properties-panel code written here  -->
+   
 
     <div id="properties-panel">
 
@@ -48,11 +58,20 @@
       <div id="text-props">
         <label>Text</label>
         <textarea id="prop-text"></textarea>
+
+        <label>Text Color</label>
+        <input type="color" id="prop-text-color" />
       </div>
+
+
+
+      <!-- layer panel code written here  -->
 
       <hr style="margin: 20px 0; border-color: #3a3a3a;" />
 
       <h3>Layers</h3>
+
+      
 
       <div id="layers-panel"></div>
 
@@ -60,8 +79,12 @@
         <button id="layer-up">Move Up</button>
         <button id="layer-down">Move Down</button>
       </div>
+
+      <!-- exports code wriiten here  -->
       
       <hr style="margin: 20px 0; border-color: #3a3a3a;" />
+
+        <h3>Exports</h3>
         <button onclick="exportAsJSON()">Export JSON</button>
         <button onclick="exportAsHTML()">Export HTML</button>
    

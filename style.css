@@ -144,9 +144,9 @@ body {
 
 
 
-/* =========================
-   PROPERTIES PANEL
-========================= */
+
+   /* PROPERTIES PANEL Sidebar styling start from here  */
+
 
 #properties-panel {
   width: 280px;
@@ -162,7 +162,7 @@ body {
   color: #b5b0aa;
   font-size: 14px;
   font-weight: 500;
-  margin-bottom: 110px;
+  margin-bottom: 60px;
 }
 
 /* Labels */
@@ -251,12 +251,15 @@ body {
   border: 1px solid #3a3a3a;
   outline: none;
   font-size: 13px;
+  margin-bottom: 30px;
 }
 
 #text-props textarea:focus {
   border-color: #4f8cff;
 }
 
+
+/* layer panel css start from here  */
 
 
 #layers-panel {
@@ -272,6 +275,7 @@ body {
   background: #1f1f1f;
   border: 1px solid #3a3a3a;
   cursor: pointer;
+
 }
 
 .layer-item.active {
@@ -292,6 +296,7 @@ body {
   border: 1px solid #3a3a3a;
   cursor: pointer;
   transition: scale 0.7s linear;
+  margin-top: 14px;
 }
 
 #layer-controls button:active{
