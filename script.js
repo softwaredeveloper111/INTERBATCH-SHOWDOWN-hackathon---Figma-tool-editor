@@ -276,6 +276,8 @@ canvasAreaSection.addEventListener('click', () => {
   propBg.value = "";
   propText.value = "";
   textProps.style.display = "none";
+  propTextColor.value = "#ffffff";
+
   renderLayers();
 
 
@@ -820,7 +822,8 @@ function exportAsJSON() {
       const domEl = document.getElementById(el.id);
       return {
         ...el,
-        text: domEl ? domEl.textContent : ""
+        text: domEl ? domEl.textContent : "",
+        textColor: domEl ? domEl.style.color : "#ffffff"
       };
     }
     return el;
