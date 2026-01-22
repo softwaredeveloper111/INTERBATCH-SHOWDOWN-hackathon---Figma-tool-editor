@@ -4,6 +4,24 @@ const textBtn = document.querySelector("#textIcon")
 const canvasAreaSection = document.querySelector("#canvas")
 
 
+
+
+
+
+
+// dom reference 
+const propWidth = document.querySelector("#prop-width");
+const propHeight = document.querySelector("#prop-height");
+const propBg = document.querySelector("#prop-bg");
+const propText = document.querySelector("#prop-text");
+const textProps = document.querySelector("#text-props");
+
+
+
+
+
+
+
 const randomId = (length = 6) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
@@ -24,6 +42,25 @@ function selectElementById(id) {
 
   addResizeHandles(el);
   addRotateHandle(el); 
+  renderLayers();
+
+
+    const elData = getElementDataById(id);
+    if (!elData) return;
+
+    // populate inputs
+    propWidth.value = elData.width;
+    propHeight.value = elData.height;
+    propBg.value = elData.bgColor || "#000000";
+
+    // text-specific
+    if (elData.type === "text") {
+      textProps.style.display = "block";
+      propText.value = document.getElementById(id).textContent;
+    } else {
+      textProps.style.display = "none";
+    }
+
 }
 
 
@@ -96,8 +133,11 @@ rectBtn.addEventListener("click",(e)=>{
   div.id = id;
   div.dataset.type = "rect"
 
+
   canvasAreaSection.append(div)
   elements.push({id,type:"rect",x,y,width:100,height:80,bgColor:"#4f8cff", rotation: 0})
+  syncZIndex();
+  renderLayers();
   selectElementById(div.id);
 
 
@@ -162,12 +202,15 @@ textBtn.addEventListener("click",(e)=>{
   div.id = id;
   div.dataset.type = "text"
 
+
   canvasAreaSection.append(div)
   elements.push({id,type:"text",x,y,width:190,height:30,bgColor:"transparent",  rotation: 0})
+  syncZIndex();
+  renderLayers();
   selectElementById(div.id);
 
 
-
+ 
   div.addEventListener("input", () => {
   const elData = getElementDataById(div.id);
   if (!elData) return;
@@ -220,6 +263,14 @@ canvasAreaSection.addEventListener('click', () => {
   });
 
   selectedElementId = null;
+    propWidth.value = "";
+  propHeight.value = "";
+  propBg.value = "";
+  propText.value = "";
+  textProps.style.display = "none";
+  renderLayers();
+
+
 });
 
 
@@ -408,3 +459,152 @@ function addRotateHandle(el) {
 
   el.appendChild(handle);
 }
+
+
+
+
+
+// layer panel helper function
+
+const layersPanel = document.querySelector("#layers-panel");
+
+function renderLayers() {
+  layersPanel.innerHTML = "";
+
+  // Topmost should appear at top of list (Figma-like)
+  [...elements].reverse().forEach(elData => {
+    const item = document.createElement("div");
+    item.className = "layer-item";
+    item.textContent = `${elData.type} (${elData.id})`;
+
+    if (elData.id === selectedElementId) {
+      item.classList.add("active");
+    }
+
+    item.addEventListener("click", () => {
+      selectElementById(elData.id);
+      renderLayers();
+    });
+
+    layersPanel.appendChild(item);
+  });
+}
+
+
+
+
+
+
+function syncZIndex() {
+  elements.forEach((elData, index) => {
+    const el = document.getElementById(elData.id);
+    if (el) {
+      el.style.zIndex = index + 1;
+    }
+  });
+}
+
+
+
+
+
+
+
+// Move up & Move down logic
+
+
+const layerUpBtn = document.querySelector("#layer-up");
+const layerDownBtn = document.querySelector("#layer-down");
+
+layerUpBtn.addEventListener("click", () => {
+  if (!selectedElementId) return;
+
+  const index = elements.findIndex(e => e.id === selectedElementId);
+  if (index === -1 || index === elements.length - 1) return;
+
+  [elements[index], elements[index + 1]] =
+    [elements[index + 1], elements[index]];
+
+  syncZIndex();
+  renderLayers();
+});
+
+layerDownBtn.addEventListener("click", () => {
+  if (!selectedElementId) return;
+
+  const index = elements.findIndex(e => e.id === selectedElementId);
+  if (index <= 0) return;
+
+  [elements[index], elements[index - 1]] =
+    [elements[index - 1], elements[index]];
+
+  syncZIndex();
+  renderLayers();
+});
+
+
+
+
+
+
+// properties panel handling for width
+
+propWidth.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const value = Math.max(30, Number(propWidth.value));
+  el.style.width = value + "px";
+  elData.width = value;
+});
+
+
+
+
+// properties panel handling for height
+
+propHeight.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const value = Math.max(30, Number(propHeight.value));
+  el.style.height = value + "px";
+  elData.height = value;
+});
+
+
+
+// properties panel handling for Background Color
+
+propBg.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  el.style.backgroundColor = propBg.value;
+  elData.bgColor = propBg.value;
+});
+
+
+
+
+
+// properties panel handling for text-content
+
+propText.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || elData.type !== "text") return;
+
+  el.textContent = propText.value;
+});
