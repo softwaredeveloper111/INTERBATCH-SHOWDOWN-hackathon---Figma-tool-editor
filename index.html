@@ -15,7 +15,7 @@
 
 
   <div id="app">
-    
+
 
 
     <!-- left-toolbar is here  -->
@@ -34,11 +34,11 @@
 
       </div>
     </div>
-   
-    
+
+
 
     <!-- properties-panel code written here  -->
-   
+
 
     <div id="properties-panel">
 
@@ -49,6 +49,13 @@
 
       <label>Height</label>
       <input type="number" id="prop-height" />
+
+      <label>Rotation (deg)</label>
+      <input type="number" id="prop-rotation" min="-180" max="180" />
+
+      <label>Opacity</label>
+      <input type="range" id="prop-opacity" min="0" max="1" step="0.05" />
+
 
 
       <label>Background</label>
@@ -61,6 +68,18 @@
 
         <label>Text Color</label>
         <input type="color" id="prop-text-color" />
+
+        <label>Font Size</label>
+        <input type="range" id="prop-font-size" min="10" max="40" />
+
+        <label>Text Align</label>
+        <div id="text-align-icon-container">
+          <span data-align="left"><i class="ri-align-left"></i></span>
+          <span data-align="center"><i class="ri-align-center"></i></span>
+          <span data-align="right"><i class="ri-align-right"></i></span>
+        </div>
+
+
       </div>
 
 
@@ -71,7 +90,7 @@
 
       <h3>Layers</h3>
 
-      
+
 
       <div id="layers-panel"></div>
 
@@ -81,23 +100,22 @@
       </div>
 
       <!-- exports code wriiten here  -->
-      
+
       <hr style="margin: 20px 0; border-color: #3a3a3a;" />
 
-        <h3>Exports</h3>
-        <button onclick="exportAsJSON()">Export JSON</button>
-        <button onclick="exportAsHTML()">Export HTML</button>
-   
+      <h3>Exports</h3>
+      <button onclick="exportAsJSON()">Export JSON</button>
+      <button onclick="exportAsHTML()">Export HTML</button>
+
 
     </div>
 
 
 
-
   </div>
 
+  <script  src="./script.js"></script>
 
-  <script src="./script.js"></script>
 </body>
 
 </html>

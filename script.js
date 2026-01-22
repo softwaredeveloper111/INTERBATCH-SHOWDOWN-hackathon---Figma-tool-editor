@@ -12,19 +12,75 @@ const propBg = document.querySelector("#prop-bg");
 const propText = document.querySelector("#prop-text");
 const textProps = document.querySelector("#text-props");
 const propTextColor = document.querySelector("#prop-text-color");
+const propRotation = document.querySelector("#prop-rotation");
+const propFontSize = document.querySelector("#prop-font-size");
+const propOpacity = document.querySelector("#prop-opacity");
+const textAlignContainer = document.querySelector("#text-align-icon-container");
+const layersPanel = document.querySelector("#layers-panel");
+const layerUpBtn = document.querySelector("#layer-up");
+const layerDownBtn = document.querySelector("#layer-down");
 
 
 
 
 
+const elements = [];
+let selectedElementId = null;
+const base = 40;
 
 
 
+// dragging the element
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let elementStartX = 0;
+let elementStartY = 0;
+
+
+
+// resize the element
+let isResizing = false;
+let resizeDirection = null;
+let resizeStartX = 0;
+let resizeStartY = 0;
+let startWidth = 0;
+let startHeight = 0;
+let startX = 0;
+let startY = 0;
+
+
+
+
+// rotation the element
+let isRotating = false;
+let rotateCenterX = 0;
+let rotateCenterY = 0;
+
+
+
+
+
+// random id generate for each element in canvas utils function
 const randomId = (length = 6) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
 
 
+
+// utility function converty rbg to hex
+function rgbToHex(rgb) {
+  const res = rgb.match(/\d+/g);
+  return "#" + res.map(x =>
+    (+x).toString(16).padStart(2, "0")
+  ).join("");
+}
+
+
+
+
+
+// select the element in cancas by id 
 function selectElementById(id) {
   canvasAreaSection.querySelectorAll(".selected").forEach(el => {
     el.classList.remove("selected");
@@ -50,12 +106,30 @@ function selectElementById(id) {
     propWidth.value = elData.width;
     propHeight.value = elData.height;
     propBg.value = elData.bgColor || "#000000";
+    propRotation.value = Math.round(elData.rotation || 0);
+   propOpacity.value = elData.opacity ?? 1;
+
+
 
     // text-specific
         if (elData.type === "text") {
       textProps.style.display = "block";
       propText.value = el.textContent;
+      propFontSize.value = parseInt(
+       window.getComputedStyle(el).fontSize
+     );
 
+     // reset active state
+    textAlignContainer
+      .querySelectorAll("span")
+      .forEach(span => span.classList.remove("active"));
+
+    // mark active alignment
+    const currentAlign = elData.textAlign || "left"; 
+    const activeBtn = textAlignContainer.querySelector(
+      `span[data-align="${currentAlign}"]`
+    );
+    if (activeBtn) activeBtn.classList.add("active");
      
       el.style.height = "auto";
       elData.height = el.scrollHeight;
@@ -74,53 +148,14 @@ function selectElementById(id) {
 
 
 
-
-
-const elements = [];
-let selectedElementId = null;
-const base = 40;
-
-
-
-// dragging the element
-let isDragging = false;
-
-let dragStartX = 0;
-let dragStartY = 0;
-
-let elementStartX = 0;
-let elementStartY = 0;
-
-
 function getElementDataById(id) {
   return elements.find(el => el.id === id);
 }
 
 
 
-// resize the element
 
-
-let isResizing = false;
-let resizeDirection = null;
-
-let resizeStartX = 0;
-let resizeStartY = 0;
-
-let startWidth = 0;
-let startHeight = 0;
-let startX = 0;
-let startY = 0;
-
-
-// rotation the element
-let isRotating = false;
-let rotateCenterX = 0;
-let rotateCenterY = 0;
-
-
-
-// rectangle functionality all add here
+// rectangle element create functionality all add here
 rectBtn.addEventListener("click",(e)=>{
   
   const id = randomId(10);
@@ -183,7 +218,7 @@ rectBtn.addEventListener("click",(e)=>{
 
 
 
-// textbutton functionality all add here 
+// text element create  functionality all add here 
 textBtn.addEventListener("click",(e)=>{
 
   const id = randomId(10);
@@ -205,6 +240,8 @@ textBtn.addEventListener("click",(e)=>{
   div.contentEditable = true;
   div.style.wordBreak = "break-word";
   div.style.whiteSpace = "pre-wrap";
+  div.style.textAlign = "left";
+
   
 
   div.id = id;
@@ -262,7 +299,10 @@ textBtn.addEventListener("click",(e)=>{
 
 
 
-// deselect everying click on canvas
+
+
+
+// deselect everying when click on canvas
 canvasAreaSection.addEventListener('click', () => {
   canvasAreaSection.querySelectorAll(".selected").forEach(el => {
     el.classList.remove("selected");
@@ -290,6 +330,7 @@ canvasAreaSection.addEventListener('click', () => {
 document.addEventListener("mousemove", (e) => {
   
   if (isResizing &&  selectedElementId) {
+  if (!resizeDirection) return;
   const el = document.getElementById(selectedElementId);
   const elData = getElementDataById(selectedElementId);
   if (!el || !elData) return;
@@ -406,6 +447,8 @@ document.addEventListener("mouseup", () => {
 });
 
 
+
+
 // keyboard interaction for delete as well as mouup and move down via arrow key
 document.addEventListener("keydown", (e) => {
   if (!selectedElementId) return;
@@ -478,6 +521,7 @@ document.addEventListener("keydown", (e) => {
 
 
 
+// resize the element when select the element
 function addResizeHandles(el) {
   removeResizeHandles(el);
 
@@ -510,6 +554,9 @@ function addResizeHandles(el) {
 }
 
 
+
+
+// remove the resize handle
 function removeResizeHandles(el) {
   el.querySelectorAll(".resize-handle").forEach(h => h.remove());
 }
@@ -521,8 +568,6 @@ function removeResizeHandles(el) {
 
 
 // rotation helper function
-
-
 function addRotateHandle(el) {
   const handle = document.createElement("div");
   handle.className = "rotate-handle";
@@ -546,8 +591,6 @@ function addRotateHandle(el) {
 
 
 // layer panel helper function
-
-const layersPanel = document.querySelector("#layers-panel");
 
 function renderLayers() {
   layersPanel.innerHTML = "";
@@ -573,9 +616,6 @@ function renderLayers() {
 
 
 
-
-
-
 function syncZIndex() {
   elements.forEach((elData, index) => {
     const el = document.getElementById(elData.id);
@@ -592,11 +632,6 @@ function syncZIndex() {
 
 
 // Move up & Move down logic
-
-
-const layerUpBtn = document.querySelector("#layer-up");
-const layerDownBtn = document.querySelector("#layer-down");
-
 layerUpBtn.addEventListener("click", () => {
   if (!selectedElementId) return;
 
@@ -630,8 +665,9 @@ layerDownBtn.addEventListener("click", () => {
 
 
 
-// properties panel handling for width
 
+
+// properties panel handling for width
 propWidth.addEventListener("input", () => {
   if (!selectedElementId) return;
 
@@ -648,7 +684,6 @@ propWidth.addEventListener("input", () => {
 
 
 // properties panel handling for height
-
 propHeight.addEventListener("input", () => {
   if (!selectedElementId) return;
 
@@ -663,8 +698,9 @@ propHeight.addEventListener("input", () => {
 
 
 
-// properties panel handling for Background Color
 
+
+// properties panel handling for Background Color
 propBg.addEventListener("input", () => {
   if (!selectedElementId) return;
 
@@ -681,7 +717,6 @@ propBg.addEventListener("input", () => {
 
 
 // properties panel handling for text-content
-
 propText.addEventListener("input", () => {
   if (!selectedElementId) return;
 
@@ -697,8 +732,114 @@ propText.addEventListener("input", () => {
 
 
 
-//save and load in localstorage
 
+// properties panel for change color of text
+propTextColor.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+
+  if (!el || elData.type !== "text") return;
+
+  el.style.color = propTextColor.value;
+  saveToLocalStorage();
+});
+
+
+
+
+//properties panel rotation functionality
+propRotation.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  const angle = Number(propRotation.value);
+  el.style.transform = `rotate(${angle}deg)`;
+  elData.rotation = angle;
+
+  saveToLocalStorage();
+});
+
+
+
+
+//properties panel  - handle the font-size
+ propFontSize.addEventListener("input", () => {
+ if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || elData.type !== "text") return;
+
+  el.style.fontSize = propFontSize.value + "px";
+
+  // re-sync height
+  el.style.height = "auto";
+  elData.height = el.scrollHeight;
+  el.style.height = elData.height + "px";
+
+  elData.fontSize = propFontSize.value;
+  saveToLocalStorage();
+});
+
+
+
+
+//properties panel handling the opacity code
+propOpacity.addEventListener("input", () => {
+  if (!selectedElementId) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+  if (!el || !elData) return;
+
+  el.style.opacity = propOpacity.value;
+  elData.opacity = Number(propOpacity.value);
+
+  saveToLocalStorage();
+});
+
+
+
+
+//properties panel text align handling 
+textAlignContainer.addEventListener("click", (e) => {
+  if (!selectedElementId) return;
+
+  const btn = e.target.closest("span");
+  if (!btn) return;
+
+  const align = btn.dataset.align;
+  if (!align) return;
+
+  const el = document.getElementById(selectedElementId);
+  const elData = getElementDataById(selectedElementId);
+
+  if (!el || elData.type !== "text") return;
+
+  // apply alignment
+  el.style.textAlign = align;
+  elData.textAlign = align;
+
+  // update UI
+  textAlignContainer
+    .querySelectorAll("span")
+    .forEach(span => span.classList.remove("active"));
+  btn.classList.add("active");
+
+  saveToLocalStorage();
+});
+
+
+
+
+
+
+// save and load in localstorage
 function saveToLocalStorage() {
   const data = elements.map(el => {
     if (el.type === "text") {
@@ -706,7 +847,8 @@ function saveToLocalStorage() {
       return {
         ...el,
         text: domEl ? domEl.textContent : "",
-        textColor: domEl ? domEl.style.color : "#ffffff"
+        textColor: domEl ? domEl.style.color : "#ffffff",
+        textAlign: domEl ? domEl.style.textAlign || "left" : "left"
       };
     }
     return el;
@@ -714,7 +856,6 @@ function saveToLocalStorage() {
 
   localStorage.setItem("figma-editor-data", JSON.stringify(data));
 }
-
 
 
 function recreateElement(data) {
@@ -744,6 +885,8 @@ function recreateElement(data) {
     div.style.whiteSpace = "pre-wrap";
     div.style.cursor = "text";
     div.style.backgroundColor = "transparent";
+    div.style.textAlign = data.textAlign || "left";
+
   }
 
   canvasAreaSection.appendChild(div);
@@ -793,10 +936,6 @@ function recreateElement(data) {
 }
 
 
-
-
-
-
 window.addEventListener("load", () => {
   const saved = localStorage.getItem("figma-editor-data");
   if (!saved) return;
@@ -814,8 +953,8 @@ window.addEventListener("load", () => {
 
 
 
-// JSON export function  funtion for (JSON)
 
+// JSON export function  funtion for (JSON)
 function exportAsJSON() {
   const data = elements.map(el => {
     if (el.type === "text") {
@@ -843,8 +982,8 @@ function exportAsJSON() {
 }
 
 
-// export html ka function
 
+// export html ka function
 function exportAsHTML() {
   let html = `
 <!DOCTYPE html>
@@ -911,30 +1050,3 @@ function exportAsHTML() {
 
   URL.revokeObjectURL(url);
 }
-
-
-
-
-// adding extra feature like change the color of text 
-
-function rgbToHex(rgb) {
-  const res = rgb.match(/\d+/g);
-  return "#" + res.map(x =>
-    (+x).toString(16).padStart(2, "0")
-  ).join("");
-}
-
-
-
-
-propTextColor.addEventListener("input", () => {
-  if (!selectedElementId) return;
-
-  const el = document.getElementById(selectedElementId);
-  const elData = getElementDataById(selectedElementId);
-
-  if (!el || elData.type !== "text") return;
-
-  el.style.color = propTextColor.value;
-  saveToLocalStorage();
-});

@@ -259,6 +259,21 @@ body {
 }
 
 
+#text-align-icon-container{
+  display: flex;
+  width: 70%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#text-align-icon-container>span{
+  background-color: rgb(23,24,25);
+  padding: 10px;
+  border-radius: 32px;
+  cursor: pointer;
+}
+
+
 /* layer panel css start from here  */
 
 
@@ -268,6 +283,8 @@ body {
   gap: 6px;
 
 }
+
+
 
 .layer-item {
   padding: 6px 8px;
