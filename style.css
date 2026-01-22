@@ -297,3 +297,35 @@ body {
 #layer-controls button:active{
   scale: 0.5;
 }
+
+
+
+/* export panle styling */
+
+
+
+#properties-panel button {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 30px;
+
+  background-color: #1f1f1f;
+  color: #eaeaea;
+
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+
+  font-size: 12px;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#properties-panel button:hover {
+  background-color: #2a2a2a;
+  border-color: #4f8cff;
+}
+
+#properties-panel button:active {
+  background-color: #1a1a1a;
+}

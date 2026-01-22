@@ -731,4 +731,99 @@ window.addEventListener("load", () => {
 
 
 
+// JSON export function  funtion for (JSON)
 
+function exportAsJSON() {
+  const data = elements.map(el => {
+    if (el.type === "text") {
+      const domEl = document.getElementById(el.id);
+      return {
+        ...el,
+        text: domEl ? domEl.textContent : ""
+      };
+    }
+    return el;
+  });
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "design.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+// export html ka function
+
+function exportAsHTML() {
+  let html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exported Design</title>
+</head>
+<body style="margin:0; background:#fff;">
+  <div style="
+    position: relative;
+    width: ${canvasAreaSection.clientWidth}px;
+    height: ${canvasAreaSection.clientHeight}px;
+  ">
+`;
+
+  elements.forEach(el => {
+    const domEl = document.getElementById(el.id);
+
+    let baseStyle = `
+      position: absolute;
+      left: ${el.x}px;
+      top: ${el.y}px;
+      width: ${el.width}px;
+      height: ${el.height}px;
+      transform: rotate(${el.rotation}deg);
+    `;
+
+    if (el.type === "text") {
+      html += `
+    <div style="
+      ${baseStyle}
+      color: black;
+      background-color: transparent;
+      white-space: pre-wrap;
+      word-break: break-word;
+    ">
+      ${domEl ? domEl.textContent : ""}
+    </div>
+`;
+    } else {
+      html += `
+    <div style="
+      ${baseStyle}
+      background-color: ${el.bgColor};
+    "></div>
+`;
+    }
+  });
+
+  html += `
+  </div>
+</body>
+</html>
+`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "design.html";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
