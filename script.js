@@ -392,6 +392,7 @@ document.addEventListener("mouseup", () => {
   isResizing = false;
   isRotating = false;
   resizeDirection = null;
+  saveToLocalStorage();
 });
 
 
@@ -527,6 +528,7 @@ layerUpBtn.addEventListener("click", () => {
 
   syncZIndex();
   renderLayers();
+  saveToLocalStorage();
 });
 
 layerDownBtn.addEventListener("click", () => {
@@ -540,6 +542,7 @@ layerDownBtn.addEventListener("click", () => {
 
   syncZIndex();
   renderLayers();
+  saveToLocalStorage();
 });
 
 
@@ -608,3 +611,124 @@ propText.addEventListener("input", () => {
 
   el.textContent = propText.value;
 });
+
+
+
+
+
+
+//save and load in localstorage
+
+function saveToLocalStorage() {
+  const data = elements.map(el => {
+    if (el.type === "text") {
+      const domEl = document.getElementById(el.id);
+      return {
+        ...el,
+        text: domEl ? domEl.textContent : ""
+      };
+    }
+    return el;
+  });
+
+  localStorage.setItem("figma-editor-data", JSON.stringify(data));
+}
+
+
+
+function recreateElement(data) {
+  const div = document.createElement("div");
+  div.id = data.id;
+  div.dataset.type = data.type;
+
+  div.style.position = "absolute";
+  div.style.left = data.x + "px";
+  div.style.top = data.y + "px";
+  div.style.width = data.width + "px";
+  div.style.height = data.height + "px";
+
+  if (data.type === "text") {
+  div.style.height = "auto";
+  div.style.height = div.scrollHeight + "px";
+   }
+
+  div.style.backgroundColor = data.bgColor;
+  div.style.transform = `rotate(${data.rotation}deg)`;
+
+  if (data.type === "text") {
+    div.textContent = data.text || "";
+    div.contentEditable = true;
+    div.style.color = "white";
+    div.style.wordBreak = "break-word";
+    div.style.whiteSpace = "pre-wrap";
+    div.style.cursor = "text";
+    div.style.backgroundColor = "transparent";
+  }
+
+  canvasAreaSection.appendChild(div);
+  elements.push({
+  id: data.id,
+  type: data.type,
+  x: data.x,
+  y: data.y,
+  width: data.width,
+  height: data.height,
+  bgColor: data.bgColor,
+  rotation: data.rotation
+});
+
+  // selection
+  div.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectElementById(div.id);
+  });
+
+  // dragging
+  div.addEventListener("mousedown", (e) => {
+    if (e.target !== div) return;
+    if (div.id !== selectedElementId) return;
+
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+
+    const elData = getElementDataById(div.id);
+    elementStartX = elData.x;
+    elementStartY = elData.y;
+  });
+
+  // text auto height
+  if (data.type === "text") {
+    div.addEventListener("input", () => {
+      const elData = getElementDataById(div.id);
+      div.style.height = "auto";
+      div.style.height = div.scrollHeight + "px";
+      elData.height = div.scrollHeight;
+      saveToLocalStorage();
+    });
+  }
+}
+
+
+
+
+
+
+window.addEventListener("load", () => {
+  const saved = localStorage.getItem("figma-editor-data");
+  if (!saved) return;
+
+  const parsed = JSON.parse(saved);
+  parsed.forEach(elData => {
+    recreateElement(elData);
+  });
+
+  syncZIndex();
+  renderLayers();
+});
+
+
+
+
+
+
