@@ -886,6 +886,14 @@ function recreateElement(data) {
     div.style.cursor = "text";
     div.style.backgroundColor = "transparent";
     div.style.textAlign = data.textAlign || "left";
+    
+    if (data.fontSize) {
+    div.style.fontSize = data.fontSize + "px";
+   }
+
+   if (data.opacity !== undefined) {
+  div.style.opacity = data.opacity;
+   }
 
   }
 
