@@ -41,12 +41,16 @@ body {
 
 #left-toolbar span{
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight:100;
   cursor: pointer;
-  background-color: rgb(79, 143, 216);
   border-radius: 5px;
   padding: 5px;
   transition: scale 0.4s linear;
+}
+
+#left-toolbar span i{
+  color: rgb(143, 139, 139);
+   font-weight:100;
 }
 
 #left-toolbar span:active{
@@ -72,8 +76,8 @@ body {
 
 /* #canvas styling  */
 #canvas{
- width: 900px;
-  height: 600px;
+ width: 1200px;
+  height: 700px;
   background-color: #252525;
    background-image:
     linear-gradient(#2f2f2f 1px, transparent 1px),
@@ -162,7 +166,7 @@ body {
   color: #b5b0aa;
   font-size: 14px;
   font-weight: 500;
-  margin-bottom: 60px;
+  margin-bottom: 50px;
 }
 
 /* Labels */
@@ -170,7 +174,7 @@ body {
   display: block;
   font-size: 11px;
   color: #9a948c;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 /* Number inputs */
@@ -183,7 +187,7 @@ body {
   border: 1px solid #3a3a3a;
   outline: none;
   font-size: 13px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 #properties-panel input[type="number"]:focus {
@@ -191,6 +195,9 @@ body {
 }
 
 
+#properties-panel input{
+  margin-bottom: 30px;
+}
 
 
 
@@ -203,10 +210,12 @@ body {
   border: 1px solid #3a3a3a;
   background-color: transparent;
   cursor: pointer;
-  margin-bottom: 40px;
+ margin-bottom: 30px;
 }
 
 /* Remove ugly default color picker padding */
+
+
 #properties-panel input[type="color"] {
   appearance: none;
   -webkit-appearance: none;
@@ -216,6 +225,8 @@ body {
   border: 1px solid #3a3a3a;
   background: #1f1f1f;
 }
+
+
 
 #properties-panel input[type="color"] {
   width: 100%;
