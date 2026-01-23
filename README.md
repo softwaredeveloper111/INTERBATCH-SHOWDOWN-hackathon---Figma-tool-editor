@@ -5,7 +5,7 @@ A **Figma-inspired visual design editor** built using **pure HTML, CSS, and Vani
 ---
 
 ## 🚀 Live Demo
-🔗 *[(click for redirect in live link)](https://softwaredeveloper111.github.io/INTERBATCH-SHOWDOWN-hackathon---Figma-tool-editor/)*
+🔗 *[(click for redirect in live link)](https://interbatch-showdown-hackathon-figma-tool-editor-agdlsovqr.vercel.app/)*
 
 ---
 
